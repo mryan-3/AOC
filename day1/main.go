@@ -5,13 +5,24 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
-	"unicode"
+	"strings"
+    "strconv"
 )
 func check(e error){
     if e != nil{
         panic(e)
     }
+}
+var numberMap = map[string]int{
+    "one": 1,
+    "two": 2,
+    "three": 3,
+    "four": 4,
+    "five": 5,
+    "six": 6,
+    "seven": 7,
+    "eight": 8,
+    "nine": 9,
 }
 
 func main(){
@@ -27,37 +38,29 @@ func main(){
 
     for scanner.Scan(){
         line := scanner.Text()
-        firstDigit, lastDigit := firstAndLast(line)
-        fmt.Println("Line:", line, "First Digit: ", firstDigit, "Last DIgit: ",lastDigit)
 
-        calibrationValue := combinedValue(firstDigit, lastDigit)
-        sum += calibrationValue
-        fmt.Println(sum)
+        var nums []int
+        for word, num := range numberMap {
+            if strings.Contains(line, word) {
+                line = strings.Replace(line, word, "", -1)
+                nums = append(nums, num)
+            }
+        }
+        for _, char := range line {
+            if char >= '0' && char <= '9'{
+                num := int(char - '0')
+                nums = append(nums, num)
+            }
+        }
+        if len(nums) > 0 {
+			firstLast, _ := strconv.Atoi(fmt.Sprintf("%d%d", nums[0], nums[len(nums)-1]))
+			sum += firstLast
+		}
 
 
         if err := scanner.Err(); err != nil {
             log.Fatal(err)
         }
     }
-    fmt.Println("The sum is: ", sum)
-}
-
-func firstAndLast(line string)(int, int){
-    firstDigit, lastDigit := 0, 0
-
-
-        for _, char := range line{
-            if unicode.IsDigit(char){
-                digit, _ := strconv.Atoi(string(char))
-                if firstDigit == 0 {
-                    firstDigit = digit
-                }
-                lastDigit = digit
-            }
-        }
-        return firstDigit, lastDigit
-}
-
-func combinedValue(firstDigit, lastDigit int)int{
-    return firstDigit*10 + lastDigit
+   fmt.Println("The sum is: ", sum)
 }
