@@ -39,23 +39,23 @@ func main(){
     for scanner.Scan(){
         line := scanner.Text()
 
-        var nums []int
+
         for word, num := range numberMap {
             if strings.Contains(line, word) {
-                line = strings.Replace(line, word, "", -1)
-                nums = append(nums, num)
+                line = strings.ReplaceAll(line, word, fmt.Sprintf("%d", num))
             }
         }
+        nums := []int{}
         for _, char := range line {
             if char >= '0' && char <= '9'{
-                num := int(char - '0')
-                nums = append(nums, num)
+                nums = append(nums, int(char-'0') )
             }
         }
-        if len(nums) > 0 {
-			firstLast, _ := strconv.Atoi(fmt.Sprintf("%d%d", nums[0], nums[len(nums)-1]))
-			sum += firstLast
-		}
+        if len(nums) > 0 || len(line) > 0{
+            firstLast, _  := strconv.Atoi(fmt.Sprintf("%d%s", nums[0], line))
+            fmt.Printf("Calibrated value for '%s': %d\n", line, firstLast)
+            sum += firstLast
+        }
 
 
         if err := scanner.Err(); err != nil {
