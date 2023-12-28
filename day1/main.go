@@ -5,24 +5,27 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
-    "strconv"
+	"unicode"
+	//	"strings"
+	//  "strconv"
 )
 func check(e error){
     if e != nil{
         panic(e)
     }
 }
-var numberMap = map[string]int{
-    "one": 1,
-    "two": 2,
-    "three": 3,
-    "four": 4,
-    "five": 5,
-    "six": 6,
-    "seven": 7,
-    "eight": 8,
-    "nine": 9,
+var numberMap = map[string]string{
+    "one": "1",
+    "two": "2",
+    "three": "3",
+    "four": "4",
+    "five": "5",
+    "six": "6",
+    "seven": "7",
+    "eight": "8",
+    "nine": "9",
 }
 
 func main(){
@@ -35,32 +38,44 @@ func main(){
     sum := 0
 
     scanner := bufio.NewScanner(resp)
+    fmt.Println(resp)
 
     for scanner.Scan(){
         line := scanner.Text()
 
+        for word, digit := range numberMap{
+            line = strings.Replace(line, word, digit, -1)
+        }
+       // fmt.Println(line)
+        firstDigit, lastDigit := firstAndlastDigit(line)
+       // fmt.Println(firstDigit, lastDigit)
+        calibratedValue := combinedDigits(firstDigit, lastDigit)
+       // fmt.Println(calibratedValue)
 
-        for word, num := range numberMap {
-            if strings.Contains(line, word) {
-                line = strings.ReplaceAll(line, word, fmt.Sprintf("%d", num))
-            }
-        }
-        nums := []int{}
-        for _, char := range line {
-            if char >= '0' && char <= '9'{
-                nums = append(nums, int(char-'0') )
-            }
-        }
-        if len(nums) > 0 || len(line) > 0{
-            firstLast, _  := strconv.Atoi(fmt.Sprintf("%d%s", nums[0], line))
-            fmt.Printf("Calibrated value for '%s': %d\n", line, firstLast)
-            sum += firstLast
-        }
-
+        sum = sum + calibratedValue
+       // fmt.Println(sum)
 
         if err := scanner.Err(); err != nil {
             log.Fatal(err)
         }
     }
-   fmt.Println("The sum is: ", sum)
+ //  fmt.Println("The sum is: ", sum)
+}
+
+func firstAndlastDigit(line string)(int, int){
+    firstDIgit, lastDigit := 0, 0
+    for _, char := range line{
+        if unicode.IsDigit(char){
+            digit, _ := strconv.Atoi(string(char))
+            if firstDIgit == 0 {
+                firstDIgit= digit
+            }
+            lastDigit = digit
+        }
+    }
+    return firstDIgit, lastDigit
+}
+
+func combinedDigits(firstDIgit, lastDigit int)int{
+    return firstDIgit*10 + lastDigit
 }
